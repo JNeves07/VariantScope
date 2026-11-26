@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VariantScope — da variante ao brief de ensaios</title>
+<meta name="description" content="Enter a genetic variant and get the literature, clinical-trial landscape and open studies, with sources and evidence levels.">
+<meta name="theme-color" content="#1f6f78">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="manifest" href="/static/assets/manifest.webmanifest">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="/"><span class="dot"></span>VariantScope</a>
+    <div class="ctl">
+      <div class="seg" role="group" aria-label="Audience" id="aud">
+        <button data-v="patient" aria-pressed="true" data-i18n="patient">Patient</button>
+        <button data-v="clinician" aria-pressed="false" data-i18n="clinician">Clinician</button>
+      </div>
+      <div class="seg" role="group" aria-label="Language" id="lang">
+        <button data-v="en" aria-pressed="true">EN</button>
+        <button data-v="pt" aria-pressed="false">PT</button>
+      </div>
+      <button id="tema" class="iconbtn" type="button" aria-label="Alternar tema" title="Alternar tema">◐</button>
+    </div>
+  </div>
+</header>
+
+<div id="demo" class="demo" hidden></div>
+
+<main class="wrap">
+  <section class="hero">
+    <p class="eyebrow" data-i18n="eyebrow">For patients, families and clinicians</p>
+    <h1 data-i18n="h1">From mutation to trial brief.</h1>
+    <p class="lede" data-i18n="lede">Enter an rsID or a gene + protein change. Get the papers, the trial landscape and the studies recruiting near you — every line linked to its source.</p>
+    <form id="form" class="search" autocomplete="off">
+      <div class="field grow"><label for="q" data-i18n="lq">Variant</label>
+        <input id="q" name="q" required maxlength="80" placeholder="rs113488022  ·  BRAF V600E" inputmode="text" spellcheck="false"></div>
+      <div class="field"><label for="cond" data-i18n="lc">Condition (optional)</label>
+        <input id="cond" maxlength="80" placeholder="thyroid cancer"></div>
+      <div class="field"><label for="country" data-i18n="lco">Country</label>
+        <select id="country"></select></div>
+      <button class="primary" type="submit" data-i18n="go">Build brief</button>
+    </form>
+    <p class="examples"><span data-i18n="try">Try</span>
+      <button class="chip" data-ex="rs113488022">rs113488022</button>
+      <button class="chip" data-ex="BRAF V600E">BRAF V600E</button>
+      <button class="chip" data-ex="KRAS G12C">KRAS G12C</button>
+      <button class="chip" data-ex="EGFR L858R">EGFR L858R</button></p>
+  </section>
+
+  <div id="status" role="status" aria-live="polite"></div>
+  <div id="out" hidden></div>
+</main>
+
+<footer class="wrap foot">
+  <p id="disc" data-i18n="disc"></p>
+  <p class="muted" data-i18n="privacy">Privacy: queries are sent to public NCBI and ClinicalTrials.gov APIs. No accounts, no cookies, queries are not logged.</p>
+</footer>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+.git
+.github
+.pytest_cache
+.ruff_cache
+__pycache__
+*.py[cod]
+.venv
+venv
+data/*.sqlite3*
+.env
+.env.*
+!.env.example
+.vercel
+README.md
+CONTRIBUTING.md

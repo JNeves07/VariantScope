@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: variantscope
+    runtime: python
+    plan: free
+    region: frankfurt
+    pythonVersion: "3.12.0"
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers
+    healthCheckPath: /healthz
+    envVars:
+      - key: VTS_CACHE_BACKEND
+        value: memory
+      - key: VTS_JWT_SECRET
+        sync: false
+      - key: VTS_ADMIN_PASSWORD
+        sync: false
+      - key: NCBI_API_KEY
+        sync: false
+      - key: NCBI_EMAIL
+        sync: false

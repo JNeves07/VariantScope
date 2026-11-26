@@ -1,0 +1,27 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: variantscope:1.0.0
+    container_name: variantscope-api
+    ports:
+      - "${VTS_PORT:-8000}:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      VTS_DEMO: "${VTS_DEMO:-0}"
+      VTS_CACHE_BACKEND: "${VTS_CACHE_BACKEND:-sqlite}"
+      VTS_DB_PATH: /app/data/variantscope.sqlite3
+      VTS_JWT_SECRET: "${VTS_JWT_SECRET:-dev-only-change-me-rotate-this-in-production}"
+      VTS_ADMIN_PASSWORD: "${VTS_ADMIN_PASSWORD:-admin}"
+      VTS_CACHE_TTL: "${VTS_CACHE_TTL:-21600}"
+      VTS_RATE_LIMIT: "${VTS_RATE_LIMIT:-20}"
+      VTS_RATE_WINDOW: "${VTS_RATE_WINDOW:-60}"
+    volumes:
+      - variantscope-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  variantscope-data:

@@ -1,0 +1,32 @@
+[project]
+name = "variantscope"
+version = "1.0.0"
+description = "Brief de evidências e ensaios clínicos para variantes genômicas"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.29",
+  "httpx>=0.27",
+  "pydantic>=2.6",
+  "PyJWT>=2.8",
+  "mangum>=0.17",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+# B008: Depends() em defaults é o padrão idiomático do FastAPI.
+# E741: nomes curtos herdados dos parsers originais (l = linha).
+ignore = ["B008", "E741"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]

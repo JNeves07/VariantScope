@@ -1,0 +1,12 @@
+{
+  "name": "VariantScope",
+  "short_name": "VariantScope",
+  "description": "Evidências e ensaios clínicos para variantes genômicas",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f8f8",
+  "theme_color": "#1f6f78",
+  "icons": [
+    { "src": "/static/assets/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
