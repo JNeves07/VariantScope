@@ -1,4 +1,4 @@
-# VariantScope 🔬
+# VariantScope
 
 > Da variante genômica ao panorama de ensaios clínicos — com fontes rastreáveis, sem "achados" inventados por IA.
 
@@ -12,7 +12,7 @@ a presença de uma variante em um ensaio **não** implica elegibilidade nem efic
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 - **Entrada flexível**: `rs113488022`, `113488022`, `BRAF V600E`, `braf p.Val600Glu`, `BRAF:p.V600E`, `KRAS G12C`, `EGFR p.(Leu858Arg)`.
 - **Resolução via dbSNP/ClinVar** com avisos de rsID mesclado, isoforms alternativas e variantes não codificantes.
@@ -32,7 +32,7 @@ a presença de uma variante em um ensaio **não** implica elegibilidade nem efic
 
 ---
 
-## 🧱 Arquitetura
+## Arquitetura
 
 ```mermaid
 flowchart LR
@@ -60,7 +60,7 @@ flowchart LR
 
 ---
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 - **Python 3.11+** · FastAPI · Uvicorn · Pydantic · httpx · PyJWT · Mangum
 - **SQLite** (cache persistente) · cache em memória no serverless
@@ -70,7 +70,7 @@ flowchart LR
 
 ---
 
-## 🚀 Instalação e execução
+## Instalação e execução
 
 ### 1. Local (desenvolvimento)
 
@@ -130,7 +130,7 @@ O `render.yaml` já contém o serviço web. Basta criar o *Blueprint* no painel 
 
 ---
 
-## 📡 API
+## API
 
 | Método | Rota | Descrição |
 |---|---|---|
@@ -153,7 +153,7 @@ Erros: `422` entrada inválida, `404` variante não encontrada, `502` fonte indi
 
 ---
 
-## ⚙️ Variáveis de ambiente
+## Variáveis de ambiente
 
 | Variável | Padrão | Finalidade |
 |---|---|---|
@@ -171,7 +171,7 @@ Copie `.env.example` para `.env` e **troque os segredos antes de publicar**.
 
 ---
 
-## ✅ Testes e qualidade
+## Testes e qualidade
 
 ```bash
 make check          # Ruff + pytest
@@ -188,7 +188,7 @@ docker compose config -q
 
 ---
 
-## 🔒 Privacidade e segurança
+## Privacidade e segurança
 
 - Sem contas, sem cookies e sem analytics.
 - A consulta digitada **nunca** é gravada em claro: a chave do cache é um SHA-256 dos parâmetros normalizados.
@@ -198,7 +198,7 @@ docker compose config -q
 
 ---
 
-## ⚠️ Limitações conhecidas
+## Limitações conhecidas
 
 - Apenas variantes *missense/nonsense* com alteração proteica. Não suporta HGVS `c.`, indels,
   fusões, CNVs nem variantes intrônicas/sinônimas.
@@ -216,7 +216,7 @@ resumo com verificação automática de citações e exportação PDF.
 
 ---
 
-## 📁 Estrutura
+## Estrutura
 
 ```
 VariantScope/
@@ -245,6 +245,6 @@ VariantScope/
 └── README.md
 ```
 
-## 📄 Licença
+## Licença
 
 MIT — veja [LICENSE](LICENSE). use com responsabilidade; dados de saúde exigem conferência profissional.
