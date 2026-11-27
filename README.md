@@ -114,6 +114,9 @@ O banco de cache fica no volume `variantscope-data`.
 
 ### 4. Vercel
 
+Deploy em produção: <https://variant-scope.vercel.app> (espelho da equipe: <https://variant-scope-marcelejoao7-9881.vercel.app>).
+Healthcheck: `/api/health`.
+
 1. Importe o repositório no painel da Vercel (framework: *Other*, runtime Python 3.12).
 2. O `vercel.json` usa `@vercel/python` com `api/index.py`; não há build de front-end.
 3. Defina as variáveis de ambiente (especialmente `VTS_JWT_SECRET` e `VTS_ADMIN_PASSWORD`).
