@@ -5,8 +5,10 @@ const I18N = {
     patient: "Patient", clinician: "Clinician", eyebrow: "For patients, families and clinicians", h1: "From mutation to trial brief.",
     lede: "Enter an rsID or a gene + protein change. Get the papers, the trial landscape and the studies recruiting near you — every line linked to its source.",
     lq: "Variant", lc: "Condition (optional)", lco: "Country", go: "Build brief", try: "Try", any: "Any country", loading: "Building brief from public sources…",
+    skip: "Skip to content", qhint: "Use an rsID (rs113488022) or a gene and protein change (BRAF V600E). Up to 60 characters.",
     disc: "", privacy: "Privacy: queries are sent to public NCBI and ClinicalTrials.gov APIs. No accounts, no cookies, queries are not logged.",
     variant: "Variant", gene: "Gene", change: "Protein change", clinvar: "Clinical significance (ClinVar)", conds: "Reported conditions", stars: "Review", none: "No ClinVar record",
+    clinvar_review: "ClinVar review", clinvar_review_none: "Not available",
     at_glance: "At a glance", s_rec: "Recruiting now", s_soon: "Not yet recruiting", s_total: "Trials matched to this variant", s_pubs: "PubMed papers", s_site: "Recruiting in",
     trials: "Clinical trials", status: "Status", match: "Match level", phase: "Phase", all: "All",
     st_RECRUITING: "Recruiting", st_NOT_YET_RECRUITING: "Not yet recruiting", st_ACTIVE_NOT_RECRUITING: "Active, not recruiting", st_ENROLLING_BY_INVITATION: "Enrolling by invitation", st_COMPLETED: "Completed", st_TERMINATED: "Terminated", st_WITHDRAWN: "Withdrawn", st_SUSPENDED: "Suspended", st_UNKNOWN: "Unknown status",
@@ -14,6 +16,7 @@ const I18N = {
     m_variant: "Exact variant", m_codon: "Same codon", m_gene: "Gene only", m_condition: "Condition only",
     m_variant_d: "Names this exact variant as part of the study or its inclusion criteria", m_codon_d: "Targets the same codon (e.g. other V600 changes)", m_gene_d: "Mentions the gene, not this variant", m_condition_d: "No variant mention found",
     pipeline: "Development pipeline — click a phase to filter", byyear: "Trials by start year", table: "Table view", chart: "Chart view",
+    chart_desc: "Stacked bars by status: open, active without recruiting, and completed or other. Every bar is focusable and reports the totals for its year.",
     g_open: "Open or opening", g_active: "Active, not recruiting", g_closed: "Completed / other", year: "Year", trials_n: "trials",
     no_trials: "No trials match these filters.", more: "Show more", sponsor: "Sponsor", enrol: "patients", sites: "Sites", countries: "Countries",
     f_variant_in_exclusion: "Variant appears in EXCLUSION criteria — check carefully", f_variant_negated: "Variant mentioned only as wild-type/negative — likely the opposite population",
@@ -21,6 +24,11 @@ const I18N = {
     pubs: "Literature", evid: "Evidence level", retracted: "RETRACTED", preprint: "Preprint", pubs_total: "papers found; top results shown",
     t1: "Reviews / guidelines", t2: "Randomised", t3: "Clinical studies", t4: "Cases / narrative", t5: "Other",
     sources: "Sources & freshness", queries: "Exact search strings", print: "Print / save PDF", copylink: "Copy link", copied: "Copied",
+    export_csv: "CSV", export_json: "JSON", export_csv_aria: "Download the current brief as CSV", export_json_aria: "Download the current brief as JSON",
+    cmp_title: "Compare two variants", cmp_q1: "Variant A", cmp_q2: "Variant B", cmp_go: "Compare",
+    cmp_hint: "Uses the condition and country from the main search.", cmp_variant: "Variant", cmp_total: "Total trials", cmp_unique: "Unique trials", cmp_common: "Shared trials", cmp_diff: "Differences",
+    cmp_use_a: "Use A", cmp_use_b: "Use B", cmp_done: "Comparison ready:",
+    csv_secao: "Section", csv_campo: "Field", csv_valor: "Value", csv_variant: "Variant", csv_trials: "Trials", csv_pubs: "Publications",
     qd_title: "Questions to ask your doctor", qd: ["Is this variant germline (inherited) or somatic (in the tumour)? Was it confirmed by a clinical-grade lab?", "Does an approved targeted therapy exist for this variant and my condition?", "Am I eligible for any of these trials (stage, prior treatments, organ function)?", "Who can contact the trial site for me?"],
     w_merged_rsid: a => `This rsID was merged into ${a.into}. Showing results for the current record.`,
     w_isoform_numbering: a => `Different transcripts number this change differently (also: ${a.alts.join(", ")}). We searched the canonical numbering. Confirm against your lab report.`,
@@ -34,8 +42,10 @@ const I18N = {
     patient: "Paciente", clinician: "Profissional", eyebrow: "Para pacientes, famílias e profissionais de saúde", h1: "Da mutação ao relatório de estudos.",
     lede: "Digite um rsID ou gene + alteração de proteína. Veja artigos, o panorama de ensaios clínicos e os estudos recrutando perto de você — cada linha com sua fonte.",
     lq: "Variante", lc: "Condição (opcional)", lco: "País", go: "Gerar relatório", try: "Exemplos", any: "Qualquer país", loading: "Montando relatório a partir de fontes públicas…",
+    skip: "Pular para o conteúdo", qhint: "Use um rsID (rs113488022) ou gene e alteração proteica (BRAF V600E). Até 60 caracteres.",
     disc: "", privacy: "Privacidade: as consultas vão para APIs públicas do NCBI e ClinicalTrials.gov. Sem contas, sem cookies, consultas não são registradas.",
     variant: "Variante", gene: "Gene", change: "Alteração na proteína", clinvar: "Significado clínico (ClinVar)", conds: "Condições relatadas", stars: "Revisão", none: "Sem registro no ClinVar",
+    clinvar_review: "Revisão do ClinVar", clinvar_review_none: "Não disponível",
     at_glance: "Resumo", s_rec: "Recrutando agora", s_soon: "Ainda não recrutando", s_total: "Ensaios ligados a esta variante", s_pubs: "Artigos no PubMed", s_site: "Recrutando em",
     trials: "Ensaios clínicos", status: "Situação", match: "Nível de correspondência", phase: "Fase", all: "Todos",
     st_RECRUITING: "Recrutando", st_NOT_YET_RECRUITING: "Ainda não recrutando", st_ACTIVE_NOT_RECRUITING: "Ativo, sem recrutar", st_ENROLLING_BY_INVITATION: "Inscrição por convite", st_COMPLETED: "Concluído", st_TERMINATED: "Encerrado", st_WITHDRAWN: "Retirado", st_SUSPENDED: "Suspenso", st_UNKNOWN: "Situação desconhecida",
@@ -43,6 +53,7 @@ const I18N = {
     m_variant: "Variante exata", m_codon: "Mesmo códon", m_gene: "Só o gene", m_condition: "Só a condição",
     m_variant_d: "Cita exatamente esta variante no estudo ou nos critérios de inclusão", m_codon_d: "Mira o mesmo códon (ex.: outras alterações V600)", m_gene_d: "Cita o gene, não esta variante", m_condition_d: "Nenhuma menção à variante",
     pipeline: "Pipeline de desenvolvimento — clique numa fase para filtrar", byyear: "Ensaios por ano de início", table: "Ver tabela", chart: "Ver gráfico",
+    chart_desc: "Barras empilhadas por situação: abertos, ativos sem recrutar e concluídos ou outros. Cada barra pode receber o foco e mostra os totais do ano.",
     g_open: "Abertos ou abrindo", g_active: "Ativos, sem recrutar", g_closed: "Concluídos / outros", year: "Ano", trials_n: "ensaios",
     no_trials: "Nenhum ensaio com estes filtros.", more: "Mostrar mais", sponsor: "Patrocinador", enrol: "pacientes", sites: "Centros", countries: "Países",
     f_variant_in_exclusion: "A variante aparece nos critérios de EXCLUSÃO — leia com atenção", f_variant_negated: "Variante citada só como selvagem/negativa — provavelmente a população oposta",
@@ -50,6 +61,11 @@ const I18N = {
     pubs: "Literatura", evid: "Nível de evidência", retracted: "RETRATADO", preprint: "Preprint", pubs_total: "artigos encontrados; mostrando os principais",
     t1: "Revisões / diretrizes", t2: "Randomizados", t3: "Estudos clínicos", t4: "Casos / narrativas", t5: "Outros",
     sources: "Fontes e atualização", queries: "Termos de busca exatos", print: "Imprimir / salvar PDF", copylink: "Copiar link", copied: "Copiado",
+    export_csv: "CSV", export_json: "JSON", export_csv_aria: "Baixar o relatório atual em CSV", export_json_aria: "Baixar o relatório atual em JSON",
+    cmp_title: "Comparar duas variantes", cmp_q1: "Variante A", cmp_q2: "Variante B", cmp_go: "Comparar",
+    cmp_hint: "Usa a condição e o país da busca principal.", cmp_variant: "Variante", cmp_total: "Total de ensaios", cmp_unique: "Ensaios exclusivos", cmp_common: "Ensaios comuns", cmp_diff: "Divergências",
+    cmp_use_a: "Usar A", cmp_use_b: "Usar B", cmp_done: "Comparação concluída:",
+    csv_secao: "Seção", csv_campo: "Campo", csv_valor: "Valor", csv_variant: "Variante", csv_trials: "Ensaios", csv_pubs: "Publicações",
     qd_title: "Perguntas para levar ao seu médico", qd: ["Esta variante é germinativa (hereditária) ou somática (no tumor)? Foi confirmada por laboratório de grau clínico?", "Existe terapia-alvo aprovada para esta variante e a minha condição?", "Posso participar de algum destes ensaios (estágio, tratamentos prévios, função dos órgãos)?", "Quem pode contatar o centro do estudo em meu nome?"],
     w_merged_rsid: a => `Este rsID foi unido a ${a.into}. Mostrando o registro atual.`,
     w_isoform_numbering: a => `Transcritos diferentes numeram esta alteração de formas diferentes (também: ${a.alts.join(", ")}). Buscamos a numeração canônica. Confirme no laudo do seu laboratório.`,
@@ -67,9 +83,19 @@ const DISCLAIMER_FALLBACK = {
 const PHASES = [["EARLY_PHASE1", "Early Ph.1"], ["PHASE1", "Phase 1"], ["PHASE2", "Phase 2"], ["PHASE3", "Phase 3"], ["PHASE4", "Phase 4"], ["NA", "N/A"]];
 const GROUPS = ["open", "active", "closed"];
 
-const state = { lang: "en", aud: "patient", data: null, tab: "recruiting", tiers: new Set(["variant", "codon"]), phase: null, shown: 8, tableView: false, pubTier: 0 };
+const state = { lang: "en", aud: "patient", data: null, comparacao: null, tab: "recruiting", tiers: new Set(["variant", "codon"]), phase: null, shown: 8, tableView: false, pubTier: 0 };
 const $ = (s, r = document) => r.querySelector(s);
 const t = (k, a) => { const v = I18N[state.lang][k] ?? I18N.en[k] ?? k; return typeof v === "function" ? v(a || {}) : v; };
+
+/* ---------- serializador CSV (puro, testável sem DOM) ---------- */
+function serializeCsv(rows) {
+  const celula = valor => {
+    const texto = valor == null ? "" : String(valor);
+    return '"' + texto.replace(/"/g, '""') + '"';
+  };
+  return "\ufeff" + rows.map(linha => linha.map(celula).join(";")).join("\r\n");
+}
+globalThis.__VTS_TEST__ = { serializeCsv };
 
 function h(tag, attrs, ...kids) {
   const el = document.createElement(tag);
@@ -89,7 +115,17 @@ const statusGroup = s => s === "RECRUITING" || s === "ENROLLING_BY_INVITATION" ?
 const chartGroup = s => { const g = statusGroup(s); return g === "recruiting" || g === "soon" ? "open" : g; };
 const phaseLabels = ps => (ps || []).map(p => (PHASES.find(x => x[0] === p) || [0, p])[1]).join(" / ") || "N/A";
 
-/* ---------- static text / i18n ---------- */
+/* ---------- foco e i18n ---------- */
+function preservarFoco(host,acao) {
+  const ativo = document.activeElement;
+  const chave = ativo && host.contains(ativo) ? ativo.dataset?.focusKey || null : null;
+  acao();
+  if (!chave) return;
+  for (const el of host.querySelectorAll("[data-focus-key]")) {
+    if (el.dataset.focusKey === chave) { el.focus(); return; }
+  }
+}
+
 function applyI18n() {
   document.documentElement.lang = state.lang === "pt" ? "pt-BR" : "en";
   document.querySelectorAll("[data-i18n]").forEach(el => { const k = el.dataset.i18n; if (k === "disc") return; el.textContent = t(k); });
@@ -101,7 +137,52 @@ function applyI18n() {
   document.body.dataset.aud = state.aud;
 }
 
-/* ---------- filtering ---------- */
+/* ---------- exportação do brief atual ---------- */
+function csvRows(d) {
+  const v = d.variant, cv = v.clinvar, rev = v.clinvar_review;
+  const linhas = [
+    [t("csv_secao"), t("csv_campo"), t("csv_valor")],
+    [t("csv_variant"), t("gene"), v.gene],
+    [t("csv_variant"), t("change"), v.change?.short],
+    [t("csv_variant"), "rsID", v.rsid],
+    [t("csv_variant"), "HGVS.c", v.hgvs_c],
+    [t("csv_variant"), t("clinvar"), (cv?.significance || []).join(", ")],
+    [t("csv_variant"), t("clinvar_review"), rev ? `${rev.review_status || ""} ${rev.last_evaluated || ""}`.trim() : t("clinvar_review_none")],
+  ];
+  for (const x of d.trials.items) {
+    linhas.push([t("csv_trials"), x.nct, [x.title, t("st_" + x.status), phaseLabels(x.phases), (x.countries || []).join("/"), t("m_" + x.tier)].filter(Boolean).join(" | ")]);
+  }
+  for (const x of d.publications.items) {
+    linhas.push([t("csv_pubs"), x.pmid, [x.title, x.journal, x.year, t("t" + x.tier)].filter(Boolean).join(" | ")]);
+  }
+  return linhas;
+}
+
+function baixar(nome, conteudo, mime) {
+  const url = URL.createObjectURL(new Blob([conteudo], { type: mime }));
+  const ancora = h("a", { href: url, download: nome, "aria-hidden": "true" });
+  document.body.append(ancora);
+  ancora.click();
+  ancora.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+function nomeArquivo(extensao) {
+  const v = state.data?.variant || {};
+  return `variantscope-${[v.gene, v.change?.short].filter(Boolean).join("-").toLowerCase() || "brief"}.${extensao}`.replace(/[^\w.-]+/g, "-");
+}
+
+function exportarCsv() {
+  if (!state.data) return;
+  baixar(nomeArquivo("csv"), serializeCsv(csvRows(state.data)), "text/csv;charset=utf-8");
+}
+
+function exportarJson() {
+  if (!state.data) return;
+  baixar(nomeArquivo("json"), JSON.stringify(state.data, null, 2), "application/json;charset=utf-8");
+}
+
+/* ---------- filtros ---------- */
 function filtered({ ignoreStatus = false, ignorePhase = false } = {}) {
   return state.data.trials.items.filter(x => {
     if (!state.tiers.has(x.tier)) return false;
@@ -113,8 +194,11 @@ function filtered({ ignoreStatus = false, ignorePhase = false } = {}) {
 
 /* ---------- sections ---------- */
 function variantCard(d) {
-  const v = d.variant, cv = v.clinvar;
+  const v = d.variant, cv = v.clinvar, rev = v.clinvar_review;
   const sig = cv && cv.significance.length ? cv.significance.map(s => h("span", { class: "badge " + (/pathogenic/.test(s) ? "b-bad" : /benign/.test(s) ? "b-ok" : "b-warn") }, s)) : [h("span", { class: "badge" }, t("none"))];
+  const detalhesRevisao = rev
+    ? [rev.review_status, rev.last_evaluated].filter(Boolean).join(" — ") || t("clinvar_review_none")
+    : t("clinvar_review_none");
   return h("section", { class: "card" },
     h("div", { class: "vhead" },
       h("div", { class: "vname" }, `${v.gene} ${v.change.short} `, h("small", { class: "mono" }, `p.${v.change.long}`)),
@@ -122,9 +206,8 @@ function variantCard(d) {
     h("div", { class: "kv" },
       v.hgvs_c ? h("span", {}, "cDNA ", h("b", { class: "mono" }, v.hgvs_c)) : null,
       v.protein_accession ? h("span", {}, "Protein ", h("b", { class: "mono" }, v.protein_accession)) : null),
-    cv ? h("div", { class: "kv" }, h("span", {}, t("clinvar") + ": "), sig,
-      cv.max_review_stars ? h("span", {}, `${t("stars")}: ${"★".repeat(cv.max_review_stars)}${"☆".repeat(4 - cv.max_review_stars)}`) : null) : null,
-    cv && cv.conditions.length ? h("div", { class: "kv" }, h("span", {}, t("conds") + ": "), h("b", {}, cv.conditions.slice(0, 4).join(" · "))) : null);
+    cv && cv.conditions.length ? h("div", { class: "kv" }, h("span", {}, t("conds") + ": "), h("b", {}, cv.conditions.slice(0, 4).join(" · "))) : null,
+    h("div", { class: "kv" }, h("span", {}, `${t("clinvar_review")}: `), h("b", {}, detalhesRevisao)));
 }
 function stat(n, l) { return h("div", { class: "stat" }, h("div", { class: "n" }, String(n)), h("div", { class: "l" }, l)); }
 function glance(d) {
@@ -135,13 +218,16 @@ function glance(d) {
   return h("section", { class: "card" }, h("h2", {}, t("at_glance")), h("div", { class: "stats" }, kids));
 }
 
-function chip(label, pressed, onclick, title) { return h("button", { class: "chip", "aria-pressed": String(pressed), title, onclick }, label); }
+function chip(label, pressed, onclick, title, foco) {
+  return h("button", { class: "chip", "aria-pressed": String(pressed), title, onclick, "data-focus-key": foco }, label);
+}
 
 function pipeline() {
   const base = filtered({ ignorePhase: true });
   return h("div", { class: "pipe" }, PHASES.map(([k, label]) => {
     const n = base.filter(x => x.phases.includes(k) || (k === "NA" && !x.phases.length)).length;
-    return h("button", { class: "ph", "aria-pressed": String(state.phase === k), onclick: () => { state.phase = state.phase === k ? null : k; state.shown = 8; renderTrials(); } },
+    return h("button", { class: "ph", "aria-pressed": String(state.phase === k), "data-focus-key": "phase:" + k,
+      onclick: () => { state.phase = state.phase === k ? null : k; state.shown = 8; renderTrials(); } },
       h("span", { class: "n" }, String(n)), h("span", { class: "l" }, label));
   }));
 }
@@ -160,15 +246,19 @@ function yearChart() {
   const names = { open: t("g_open"), active: t("g_active"), closed: t("g_closed") };
   const legend = h("div", { class: "legend" }, GROUPS.map(g => h("span", {}, h("i", { style: `background:var(--s-${g === "open" ? "open" : g === "active" ? "active" : "other"})` }), names[g])));
   if (state.tableView) {
-    const rows = span.slice().reverse().map(y => h("tr", {}, h("td", {}, y), GROUPS.map(g => h("td", {}, data[y][g]))));
-    box.append(h("table", { class: "t" }, h("tr", {}, h("th", {}, t("year")), GROUPS.map(g => h("th", {}, names[g]))), rows));
+    const tabela = h("table", { class: "t" },
+      h("thead", {}, h("tr", {}, h("th", {}, t("year")), GROUPS.map(g => h("th", {}, names[g])))),
+      h("tbody", {}, span.slice().reverse().map(y => h("tr", {}, h("td", {}, y), GROUPS.map(g => h("td", {}, data[y][g]))))));
+    box.append(h("div", { class: "tablewrap" }, tabela));
     return box;
   }
   const W = 720, H = 190, L = 28, B = 22, T = 8, bw = Math.max(4, Math.min(30, (W - L) / span.length - 4)), step = (W - L) / span.length;
   const NS = "http://www.w3.org/2000/svg", s = document.createElementNS(NS, "svg");
-  s.setAttribute("viewBox", `0 0 ${W} ${H}`); s.setAttribute("role", "img"); s.setAttribute("width", "100%");
+  s.setAttribute("viewBox", `0 0 ${W} ${H}`); s.setAttribute("role", "group"); s.setAttribute("width", "100%");
   s.setAttribute("aria-label", `${t("byyear")}: ${items.length} ${t("trials_n")}`);
   const el = (n, a, tx) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); if (tx != null) e.textContent = tx; s.append(e); return e; };
+  el("title", {}, `${t("byyear")}: ${items.length} ${t("trials_n")}`);
+  el("desc", {}, t("chart_desc"));
   const ys = v => H - B - (v / max) * (H - B - T);
   for (const v of [...new Set([0, Math.ceil(max / 2), max])]) { el("line", { x1: L, x2: W, y1: ys(v), y2: ys(v), class: "grid" }); el("text", { x: L - 6, y: ys(v) + 4, "text-anchor": "end" }, v); }
   const tip = h("div", { class: "tip", hidden: true });
@@ -180,9 +270,15 @@ function yearChart() {
       el("rect", { x, y: top, width: bw, height: Math.max(0, hgt - 2), rx: 2, fill: `var(--s-${g === "open" ? "open" : g === "active" ? "active" : "other"})` });
       acc += v;
     });
-    const hit = el("rect", { x: L + i * step, y: T, width: step, height: H - B - T, fill: "transparent" });
-    const show = () => { const tot = GROUPS.reduce((a, g) => a + data[y][g], 0); tip.hidden = false; tip.textContent = `${y}: ${tot} ${t("trials_n")} (${GROUPS.map(g => data[y][g]).join(" / ")})`; tip.style.left = `${((x + bw / 2) / W) * 100}%`; tip.style.top = `${(ys(tot) / H) * 100}%`; };
-    hit.addEventListener("mouseenter", show); hit.addEventListener("mouseleave", () => tip.hidden = true); hit.addEventListener("click", show);
+    const tot = GROUPS.reduce((a, g) => a + data[y][g], 0);
+    const rotulo = `${y}: ${tot} ${t("trials_n")} (${GROUPS.map(g => data[y][g]).join(" / ")})`;
+    const hit = el("rect", { x: L + i * step, y: T, width: step, height: H - B - T, fill: "transparent",
+      tabindex: "0", role: "button", "aria-label": rotulo });
+    const show = () => { tip.hidden = false; tip.textContent = rotulo; tip.style.left = `${((x + bw / 2) / W) * 100}%`; tip.style.top = `${(ys(tot) / H) * 100}%`; };
+    hit.addEventListener("focus", show); hit.addEventListener("blur", () => tip.hidden = true);
+    hit.addEventListener("mouseenter", show); hit.addEventListener("mouseleave", () => tip.hidden = true);
+    hit.addEventListener("click", show);
+    hit.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(); } });
     if (span.length <= 14 || i % 4 === 0 || i === span.length - 1) el("text", { x: x + bw / 2, y: H - 6, "text-anchor": "middle" }, "'" + String(y).slice(2));
   });
   box.append(s, tip, legend);
@@ -202,25 +298,27 @@ function trialCard(x) {
     h("h3", {}, x.title),
     h("div", { class: "meta" }, [x.sponsor, x.enrollment ? `${x.enrollment} ${t("enrol")}` : null, x.start_year ? String(x.start_year) : null].filter(Boolean).join(" · ")),
     x.countries.length ? h("div", { class: "meta" }, `${t("countries")}: ${x.countries.slice(0, 6).join(", ")}${x.countries.length > 6 ? ` +${x.countries.length - 6}` : ""}${cities.length ? ` — ${country}: ${cities.join(", ")}` : ""}`) : null,
-    x.flags.filter(f => f !== "gene_in_exclusion").map(f => h("div", { class: "alert", style: "margin-top:8px" }, "⚠ " + t("f_" + f))),
+    x.flags.filter(f => f !== "gene_in_exclusion").map(f => h("div", { class: "alert", style: "margin-top:8px" }, t("f_" + f))),
     x.match_snippet ? h("div", { class: "why clin-only" }, h("b", {}, t("why") + ": "), x.match_snippet) : null,
     x.interventions.length ? h("div", { class: "meta clin-only" }, x.interventions.map(i => i.name).join(" · ")) : null);
 }
 
 function renderTrials() {
-  const d = state.data, host = $("#trials"); host.replaceChildren();
-  const tabs = ["recruiting", "soon", "active", "closed", "all"];
-  const base = tabs.map(k => [k, state.data.trials.items.filter(x => state.tiers.has(x.tier) && (k === "all" || statusGroup(x.status) === k)).length]);
-  const list = filtered();
-  host.append(h("div", {},
-    h("div", { class: "filters" }, h("span", { class: "lbl" }, t("status")), base.map(([k, n]) => chip(`${t("tab_" + k)} (${n})`, state.tab === k, () => { state.tab = k; state.shown = 8; renderTrials(); }))),
-    h("div", { class: "filters" }, h("span", { class: "lbl" }, t("match")), ["variant", "codon", "gene", "condition"].map(k => chip(t("m_" + k), state.tiers.has(k), () => { state.tiers.has(k) ? state.tiers.delete(k) : state.tiers.add(k); if (!state.tiers.size) state.tiers.add(k); state.shown = 8; renderTrials(); }, t("m_" + k + "_d")))),
-    h("h2", { style: "margin-top:18px" }, t("pipeline")), pipeline(),
-    h("div", { class: "row", style: "display:flex;justify-content:space-between;align-items:center" }, h("h2", { style: "margin:0" }, t("byyear")),
-      h("button", { class: "link", onclick: () => { state.tableView = !state.tableView; renderTrials(); } }, state.tableView ? t("chart") : t("table"))),
-    yearChart(),
-    h("div", { style: "margin-top:18px" }, list.length ? list.slice(0, state.shown).map(trialCard) : h("p", { class: "muted" }, t("no_trials"))),
-    list.length > state.shown ? h("button", { class: "more", onclick: () => { state.shown += 8; renderTrials(); } }, `${t("more")} (${list.length - state.shown})`) : null));
+  preservarFoco($("#trials"), () => {
+    const d = state.data, host = $("#trials"); host.replaceChildren();
+    const tabs = ["recruiting", "soon", "active", "closed", "all"];
+    const base = tabs.map(k => [k, state.data.trials.items.filter(x => state.tiers.has(x.tier) && (k === "all" || statusGroup(x.status) === k)).length]);
+    const list = filtered();
+    host.append(h("div", {},
+      h("div", { class: "filters" }, h("span", { class: "lbl" }, t("status")), base.map(([k, n]) => chip(`${t("tab_" + k)} (${n})`, state.tab === k, () => { state.tab = k; state.shown = 8; renderTrials(); }, null, "tab:" + k))),
+      h("div", { class: "filters" }, h("span", { class: "lbl" }, t("match")), ["variant", "codon", "gene", "condition"].map(k => chip(t("m_" + k), state.tiers.has(k), () => { state.tiers.has(k) ? state.tiers.delete(k) : state.tiers.add(k); if (!state.tiers.size) state.tiers.add(k); state.shown = 8; renderTrials(); }, t("m_" + k + "_d"), "tier:" + k))),
+      h("h2", { style: "margin-top:18px" }, t("pipeline")), pipeline(),
+      h("div", { class: "row", style: "display:flex;justify-content:space-between;align-items:center" }, h("h2", { style: "margin:0" }, t("byyear")),
+        h("button", { class: "link", "data-focus-key": "view:toggle", "aria-label": t("table") + " / " + t("chart"), onclick: () => { state.tableView = !state.tableView; renderTrials(); } }, state.tableView ? t("chart") : t("table"))),
+      yearChart(),
+      h("div", { style: "margin-top:18px" }, list.length ? list.slice(0, state.shown).map(trialCard) : h("p", { class: "muted" }, t("no_trials"))),
+      list.length > state.shown ? h("button", { class: "more", "data-focus-key": "more", onclick: () => { state.shown += 8; renderTrials(); } }, `${t("more")} (${list.length - state.shown})`) : null));
+  });
 }
 
 function agentsCard(d) {
@@ -233,8 +331,8 @@ function pubsCard(d) {
   const p = d.publications, host = h("section", { class: "card" });
   const items = p.items.filter(x => !state.pubTier || x.tier === state.pubTier);
   host.append(h("h2", {}, t("pubs")), h("p", { class: "muted", style: "margin-top:-4px" }, `${p.total.toLocaleString()} ${t("pubs_total")}`),
-    h("div", { class: "filters" }, h("span", { class: "lbl" }, t("evid")), chip(t("all"), !state.pubTier, () => { state.pubTier = 0; renderPubs(); }),
-      [1, 2, 3, 4, 5].map(k => chip(t("t" + k), state.pubTier === k, () => { state.pubTier = k; renderPubs(); }))));
+    h("div", { class: "filters" }, h("span", { class: "lbl" }, t("evid")), chip(t("all"), !state.pubTier, () => { state.pubTier = 0; renderPubs(); }, null, "pub:0"),
+      [1, 2, 3, 4, 5].map(k => chip(t("t" + k), state.pubTier === k, () => { state.pubTier = k; renderPubs(); }, null, "pub:" + k))));
   items.sort((a, b) => a.retracted - b.retracted || a.tier - b.tier).slice(0, 20).forEach(x => host.append(h("div", { class: "pub" },
     ext(`https://pubmed.ncbi.nlm.nih.gov/${x.pmid}/`, x.title),
     h("div", { class: "meta muted", style: "font-size:14px" }, [x.authors.join(", "), x.journal, x.year].filter(Boolean).join(" · "), " ",
@@ -242,7 +340,12 @@ function pubsCard(d) {
       " ", h("span", { class: "mono muted" }, "PMID " + x.pmid)))));
   return host;
 }
-function renderPubs() { const old = $("#pubs"); const n = pubsCard(state.data); n.id = "pubs"; old.replaceWith(n); }
+function renderPubs() {
+  preservarFoco($("#pubs"), () => {
+    const antigo = $("#pubs"), novo = pubsCard(state.data);
+    novo.id = "pubs"; antigo.replaceWith(novo);
+  });
+}
 
 function sourcesCard(d) {
   return h("section", { class: "card" }, h("h2", {}, t("sources")),
@@ -250,27 +353,96 @@ function sourcesCard(d) {
     h("details", { class: "clin-only", style: "margin-top:10px" }, h("summary", {}, t("queries")), h("pre", {}, `PubMed:\n${d.search_strings.pubmed}\n\nClinicalTrials.gov (query.term):\n${d.search_strings.ctgov}`)));
 }
 
-function render(d) {
-  state.data = d; state.tab = "recruiting"; state.phase = null; state.shown = 8; state.pubTier = 0; state.tiers = new Set(["variant", "codon"]);
+function render(d, preservar = false) {
+  state.data = d;
+  if (!preservar) {
+    state.tab = "recruiting"; state.phase = null; state.shown = 8; state.pubTier = 0; state.tiers = new Set(["variant", "codon"]);
+  }
   applyI18n();
-  const out = $("#out"); out.hidden = false; out.replaceChildren(h("div", {},
+  const out = $("#out"); out.hidden = false;
+  const pubs = pubsCard(d); pubs.id = "pubs";
+  preservarFoco(out, () => {
+    out.replaceChildren(h("div", {},
     h("div", { class: "toolbar" },
-      h("button", { class: "link", onclick: async e => { try { await navigator.clipboard.writeText(location.href); e.target.textContent = t("copied"); } catch { } } }, t("copylink")),
-      h("button", { class: "link", onclick: () => print() }, t("print"))),
+      h("button", { class: "link", "data-focus-key": "copy", onclick: async e => { try { await navigator.clipboard.writeText(location.href); e.currentTarget.textContent = t("copied"); } catch { } } }, t("copylink")),
+      h("button", { class: "link", "data-focus-key": "print", onclick: () => print() }, t("print")),
+      h("button", { class: "link export", "data-focus-key": "export:csv", "aria-label": t("export_csv_aria"), onclick: exportarCsv }, t("export_csv")),
+      h("button", { class: "link export", "data-focus-key": "export:json", "aria-label": t("export_json_aria"), onclick: exportarJson }, t("export_json"))),
     variantCard(d),
     d.warnings.map(w => h("div", { class: "alert" + (w.code === "germline_vs_somatic" ? " info" : "") }, t("w_" + w.code, w.args))),
     glance(d),
     h("section", { class: "card" }, h("h2", {}, t("trials")), h("div", { id: "trials" })),
     agentsCard(d),
-    (() => { const s = pubsCard(d); s.id = "pubs"; return s; })(),
+    pubs,
     h("section", { class: "card pat-only" }, h("h2", {}, t("qd_title")), h("ul", {}, t("qd").map(q => h("li", {}, q)))),
     sourcesCard(d)));
-  renderTrials();
+    renderTrials();
+  });
+}
+
+/* ---------- comparação ---------- */
+function usarVariante(brief) {
+  const v = brief.variant || {};
+  const rotulo = v.gene && v.change?.short ? `${v.gene} ${v.change.short}` : v.rsid || "";
+  if (!rotulo) return;
+  $("#q").value = rotulo;
+  $("#q").focus();
+}
+
+function renderComparacao(dados) {
+  const host = $("#cmp-out"), c = dados.comparacao;
+  const colunas = [t("cmp_variant"), t("cmp_total"), t("cmp_unique"), t("cmp_common"), t("cmp_diff")];
+  const linha = (brief, indice) => {
+    const v = brief.variant || {}, chave = indice ? "b" : "a";
+    const exclusivos = c[indice ? "ensaios_unicos_b" : "ensaios_unicos_a"].length;
+    return h("tr", {},
+      h("td", {}, h("button", { class: "link", "data-focus-key": "cmp:use:" + chave,
+        "aria-label": `${t(indice ? "cmp_use_b" : "cmp_use_a")}: ${v.gene || ""} ${v.change?.short || ""}`,
+        onclick: () => usarVariante(brief) }, t(indice ? "cmp_use_b" : "cmp_use_a"))),
+      h("td", {}, `${v.gene || ""} ${v.change?.short || v.rsid || ""}`.trim()),
+      h("td", {}, String(brief.trials.items.length)),
+      h("td", {}, String(exclusivos)),
+      h("td", {}, String(c.ensaios_comuns.length)),
+      h("td", {}, `${exclusivos} ${t("cmp_unique").toLowerCase()}. ${c.divergencias.join(" ")}`));
+  };
+  preservarFoco(host, () => host.replaceChildren(
+    h("div", { class: "tablewrap" }, h("table", { class: "t cmp-t" },
+      h("thead", {}, h("tr", {},
+        h("th", {}, t("cmp_use_a") + " / " + t("cmp_use_b")), colunas.map(x => h("th", {}, x)))),
+      h("tbody", {}, linha(dados.a, 0), linha(dados.b, 1))))));
+  $("#status").textContent = `${t("cmp_done")} ${c.ensaios_comuns.length} ${t("cmp_common").toLowerCase()}.`;
+}
+
+async function comparar(evento) {
+  evento.preventDefault();
+  const botao = $("#cmp-form .primary");
+  botao.disabled = true;
+  $("#erro").textContent = "";
+  $("#status").textContent = t("loading");
+  try {
+    const corpo = {
+      q1: $("#cmp-a").value.trim(), q2: $("#cmp-b").value.trim(),
+      condition: $("#cond").value.trim() || null, country: $("#country").value || null,
+    };
+    const r = await fetch("/api/compare", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo),
+    });
+    const resposta = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(typeof resposta.detail === "string" ? resposta.detail : resposta.message || t("err"));
+    state.comparacao = resposta;
+    renderComparacao(resposta);
+  } catch (e) {
+    $("#status").textContent = "";
+    $("#erro").textContent = e.message || t("err");
+  } finally {
+    botao.disabled = false;
+  }
 }
 
 /* ---------- data ---------- */
 async function run(q, cond, country, push = true) {
-  const st = $("#status"), btn = $(".primary"); st.className = ""; st.textContent = t("loading"); btn.disabled = true;
+  const st = $("#status"), er = $("#erro"), btn = $(".primary");
+  st.className = ""; st.textContent = t("loading"); er.textContent = ""; btn.disabled = true;
   try {
     const u = new URLSearchParams({ q }); if (cond) u.set("condition", cond); if (country) u.set("country", country);
     const r = await fetch("/api/brief?" + u);
@@ -278,35 +450,39 @@ async function run(q, cond, country, push = true) {
     if (!r.ok) throw new Error(typeof body.detail === "string" ? body.detail : body.message || t("err"));
     if (push) history.replaceState(null, "", "?" + u);
     st.textContent = ""; render(body);
-  } catch (e) { st.className = "err"; st.textContent = e.message || t("err"); $("#out").hidden = true; }
+  } catch (e) { st.textContent = ""; er.textContent = e.message || t("err"); $("#out").hidden = true; }
   finally { btn.disabled = false; }
 }
-$("#form").addEventListener("submit", e => { e.preventDefault(); run($("#q").value.trim(), $("#cond").value.trim(), $("#country").value); });
-document.querySelectorAll("[data-ex]").forEach(b => b.addEventListener("click", e => { e.preventDefault(); $("#q").value = b.dataset.ex; $("#form").requestSubmit(); }));
-$("#lang").addEventListener("click", e => { const v = e.target.dataset?.v; if (v) { state.lang = v; try { localStorage.setItem("vts_lang", v); } catch { } applyI18n(); if (state.data) render(state.data); } });
-$("#aud").addEventListener("click", e => { const v = e.target.dataset?.v; if (v) { state.aud = v; applyI18n(); } });
 
-/* ---------- tema e atalhos de teclado ---------- */
-(function () {
-  const raiz = document.documentElement;
-  try { const salvo = localStorage.getItem("vts_theme"); if (salvo === "light" || salvo === "dark") raiz.dataset.theme = salvo; } catch { }
-  document.getElementById("tema")?.addEventListener("click", () => {
-    const atual = raiz.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-    const proximo = atual === "dark" ? "light" : "dark";
-    raiz.dataset.theme = proximo;
-    try { localStorage.setItem("vts_theme", proximo); } catch { }
-  });
-  document.addEventListener("keydown", e => {
-    const tag = document.activeElement?.tagName || "";
-    if (e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test(tag)) { e.preventDefault(); document.getElementById("q")?.focus(); }
-    if (e.key === "Escape" && document.activeElement === document.getElementById("q")) document.activeElement.blur();
-  });
-})();
+if (typeof document !== "undefined") {
+  $("#form").addEventListener("submit", e => { e.preventDefault(); run($("#q").value.trim(), $("#cond").value.trim(), $("#country").value); });
+  document.querySelectorAll("[data-ex]").forEach(b => b.addEventListener("click", e => { e.preventDefault(); $("#q").value = b.dataset.ex; $("#form").requestSubmit(); }));
+  $("#cmp-form").addEventListener("submit", comparar);
+  $("#lang").addEventListener("click", e => { const v = e.target.dataset?.v; if (v) { state.lang = v; try { localStorage.setItem("vts_lang", v); } catch { } applyI18n(); if (state.data) render(state.data, true); } });
+  $("#aud").addEventListener("click", e => { const v = e.target.dataset?.v; if (v) { state.aud = v; applyI18n(); } });
 
-(async function init() {
-  try { const l = localStorage.getItem("vts_lang"); if (l === "pt" || l === "en") state.lang = l; else if ((navigator.language || "").startsWith("pt")) state.lang = "pt"; } catch { }
-  try { window.__demo = (await (await fetch("/api/health")).json()).demo; } catch { }
-  applyI18n();
-  const p = new URLSearchParams(location.search);
-  if (p.get("q")) { $("#q").value = p.get("q"); $("#cond").value = p.get("condition") || ""; $("#country").value = p.get("country") || ""; run(p.get("q"), p.get("condition") || "", p.get("country") || "", false); }
-})();
+  /* ---------- tema e atalhos de teclado ---------- */
+  (function () {
+    const raiz = document.documentElement;
+    try { const salvo = localStorage.getItem("vts_theme"); if (salvo === "light" || salvo === "dark") raiz.dataset.theme = salvo; } catch { }
+    document.getElementById("tema")?.addEventListener("click", () => {
+      const atual = raiz.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      const proximo = atual === "dark" ? "light" : "dark";
+      raiz.dataset.theme = proximo;
+      try { localStorage.setItem("vts_theme", proximo); } catch { }
+    });
+    document.addEventListener("keydown", e => {
+      const tag = document.activeElement?.tagName || "";
+      if (e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test(tag)) { e.preventDefault(); document.getElementById("q")?.focus(); }
+      if (e.key === "Escape" && document.activeElement === document.getElementById("q")) document.activeElement.blur();
+    });
+  })();
+
+  (async function init() {
+    try { const l = localStorage.getItem("vts_lang"); if (l === "pt" || l === "en") state.lang = l; else if ((navigator.language || "").startsWith("pt")) state.lang = "pt"; } catch { }
+    try { window.__demo = (await (await fetch("/api/health")).json()).demo; } catch { }
+    applyI18n();
+    const p = new URLSearchParams(location.search);
+    if (p.get("q")) { $("#q").value = p.get("q"); $("#cond").value = p.get("condition") || ""; $("#country").value = p.get("country") || ""; run(p.get("q"), p.get("condition") || "", p.get("country") || "", false); }
+  })();
+}

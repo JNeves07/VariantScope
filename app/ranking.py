@@ -29,8 +29,14 @@ _INCL = re.compile(r"inclusion criteria", re.I)
 
 
 def _pats(gene: str, ch: ProteinChange):
-    exact = re.compile(rf"(?<![A-Za-z0-9])(?:p\.)?\(?(?:{ch.short}|{ch.long})\)?(?![A-Za-z0-9])", re.I)
-    codon = re.compile(rf"(?<![A-Za-z0-9]){ch.ref}{ch.pos}(?![0-9])|codon\s*{ch.pos}(?![0-9])", re.I)
+    # ch.short pode conter '*' (nonsense): cada token é literal, não regex.
+    exact = re.compile(
+        rf"(?<![A-Za-z0-9])(?:p\.)?\(?(?:{re.escape(ch.short)}|{re.escape(ch.long)})\)?(?![A-Za-z0-9])",
+        re.I,
+    )
+    codon = re.compile(
+        rf"(?<![A-Za-z0-9]){re.escape(ch.ref)}{ch.pos}(?![0-9])|codon\s*{ch.pos}(?![0-9])", re.I
+    )
     gene_re = re.compile(rf"(?<![A-Za-z0-9]){re.escape(gene)}(?![A-Za-z0-9])", re.I)
     return exact, codon, gene_re
 

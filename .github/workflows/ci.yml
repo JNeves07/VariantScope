@@ -44,6 +44,10 @@ jobs:
       - name: Sintaxe do front-end
         run: node --check frontend/app.js
 
+      - name: Serializador CSV (Node, sem dependências)
+        run: |
+          node -e "require('./frontend/app.js'); const s = globalThis.__VTS_TEST__.serializeCsv; const q = String.fromCharCode(34); const out = s([['abc;def', 'x']]); if (!out.startsWith('\ufeff') || out !== '\ufeff' + q + 'abc;def' + q + ';' + q + 'x' + q) process.exit(1)"
+
       - name: Validar configurações
         run: |
           python -c "import json, pathlib; json.loads(pathlib.Path('vercel.json').read_text())"

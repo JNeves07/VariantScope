@@ -89,6 +89,79 @@ def test_split_eligibility():
     assert "a" in inc and "b" not in inc and "b" in exc
 
 
+def test_padrao_regex_trata_asterisco_como_literal():
+    from app.ranking import _pats
+
+    q = parse_query("BRAF V600*")
+    exata, codon, _gene = _pats("BRAF", q.change)
+    assert exata.search("BRAF V600E") is None
+    assert exata.search("BRAF V600*") is not None
+    assert codon.search("BRAF V600E") is not None
+
+    q2 = parse_query("BRAF p.Tyr640Ter")
+    exata2, _, _ = _pats("BRAF", q2.change)
+    assert q2.change.short == "Y640*"
+    assert exata2.search("BRAF p.(Y640*)") is not None
+    assert exata2.search("BRAF Y640E") is None
+
+
+def test_consulta_com_asterisco_nao_gera_falso_match_variante():
+    b = run(_brief("BRAF V600*"))
+    t = {x["nct"]: x for x in b["trials"]["items"]}
+    assert t["DEMO-001"]["tier"] != "variant"
+    assert t["DEMO-001"]["tier"] == "codon"
+
+
+def test_notacao_tradicional_tyr640ter_e_segura():
+    b = run(_brief("BRAF p.Tyr640Ter"))
+    assert b["variant"]["change"]["short"] == "Y640*"
+    assert all(isinstance(x["tier"], str) for x in b["trials"]["items"])
+
+
+def test_clinvar_esummary_sucesso_e_falha_parcial():
+    import httpx
+
+    from app.demo_data import CLINVAR_REVIEW, _handler
+    from app.http import SourceError
+    from app.sources import fetch_clinvar_review
+
+    def sucesso(req):
+        uid = req.url.params.get("id")
+        return httpx.Response(200, json={"result": {"uids": [uid], uid: CLINVAR_REVIEW[uid]}})
+
+    def falha(req):
+        if req.url.path.endswith("esummary.fcgi") and req.url.params.get("db") == "clinvar":
+            return httpx.Response(404)
+        return _handler(req)
+
+    async def direto(transport):
+        http = Http(transport=transport)
+        try:
+            return await fetch_clinvar_review(http, "rs113488022")
+        finally:
+            await http.aclose()
+
+    revisao = asyncio.run(direto(httpx.MockTransport(sucesso)))
+    assert revisao["review_status"].startswith("criteria provided")
+    assert revisao["last_evaluated"] == "2025-04-12"
+    assert revisao["stars"] == 2
+    with pytest.raises(SourceError):
+        asyncio.run(direto(httpx.MockTransport(lambda req: httpx.Response(404))))
+
+    async def parcial():
+        http = Http(transport=httpx.MockTransport(falha))
+        try:
+            return await build_brief(http, "rs113488022", None, None)
+        finally:
+            await http.aclose()
+
+    b = asyncio.run(parcial())
+    assert b["variant"]["clinvar_review"] is None
+    assert any(w["code"] == "source_down" and w["args"]["source"] == "ClinVar (esummary)"
+               for w in b["warnings"])
+    assert b["publications"]["items"] and b["trials"]["items"]
+
+
 def test_source_failure_is_partial():
     import httpx
 

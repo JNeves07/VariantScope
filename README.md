@@ -23,12 +23,19 @@ a presença de uma variante em um ensaio **não** implica elegibilidade nem efic
   - menção em **critério de exclusão** ou como *wild-type/negative* nunca conta como match e vira alerta;
   - status separados (`Recruiting` ≠ `Not yet recruiting`), fase, país e ano de início.
 - **Degradação graciosa**: se uma fonte falha, as outras continuam e a interface mostra o status de cada uma.
-- **Cache TTL** em SQLite (Docker/local) ou memória (Vercel), com chave SHA-256 **sem o texto da consulta**.
+- **Enriquecimento opcional do ClinVar**: status de revisão e data da última avaliação via E-utilities `esummary`
+  para o rsID resolvido, sem exigir chave de API; falhas viram aviso, nunca uma página vazia.
+- **Comparação de variantes** (`POST /api/compare` e seção na interface): ensaios comuns, exclusivos, níveis de
+  correspondência e divergências em pt-BR, reaproveitando o mesmo orquestrador e cache do brief.
+- **Cache TTL** em SQLite (Docker/local) ou memória (Vercel), com chave SHA-256 **sem o texto da consulta**; o
+  payload cacheado contém apenas rótulos e termos canônicos, nunca o termo digitado ou filtros em claro.
 - **Modo demo offline** (`VTS_DEMO=1`): dados sintéticos, banner visível e links externos desabilitados.
 - **API documentada** (OpenAPI/Swagger), healthcheck, JWT para endpoints administrativos, CORS opcional,
-  rate limit por IP, CSP e cabeçalhos de segurança.
-- **Front-end responsivo** em HTML/CSS/JS puro: PT/EN, perfil *paciente*/*clínico*, filtros, tabela,
-  exportação CSV, tema claro/escuro persistente e atalho `/` para focar a busca.
+  rate limit por IP (com poda do mapa de IPs), CSP e cabeçalhos de segurança.
+- **Front-end responsivo e acessível** em HTML/CSS/JS puro: PT/EN, perfil *paciente*/*clínico*, filtros, tabela,
+  exportação **CSV e JSON** do brief atual, tema claro/escuro persistente, atalho `/` para focar a busca,
+  link de pulo para o conteúdo, foco preservado após re-renderizações, gráfico com barras focáveis e
+  respeito a `prefers-reduced-motion`.
 
 ---
 
@@ -38,6 +45,8 @@ a presença de uma variante em um ensaio **não** implica elegibilidade nem efic
 flowchart LR
   U[Usuário] --> F[Front-end estático\nfrontend/]
   F -->|GET /api/brief| A[FastAPI\napp/routers]
+  F -->|POST /api/compare| A
+  A --> Cmp[Comparação\napp/compare.py]
   A --> B[Orquestrador\napp/brief.py]
   B --> C[Normalização\napp/normalize.py]
   B --> D[Clientes HTTP\napp/sources.py + app/http.py]
@@ -97,7 +106,8 @@ $env:VTS_DEMO=1; uvicorn app.main:app --port 8000   # Windows PowerShell
 ```
 
 O banner de demo aparece na interface e os links externos ficam desabilitados.
-No Windows, `make demo` também funciona se o GNU Make estiver disponível.
+No Windows, use o comando PowerShell acima: o alvo `make demo` usa sintaxe de atribuição Unix e depende de um
+shell compatível (Git Bash/WSL), não apenas do GNU Make instalado no `cmd.exe`.
 
 ### 3. Docker
 
@@ -137,7 +147,8 @@ O `render.yaml` já contém o serviço web. Basta criar o *Blueprint* no painel 
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `GET` | `/api/brief?q=BRAF%20V600E&condition=melanoma&country=Brazil` | Gera o brief |
+| `GET` | `/api/brief?q=BRAF%20V600E&condition=melanoma&country=Brazil` | Gera o brief (até 60 caracteres em `q`) |
+| `POST` | `/api/compare` | Compara dois briefs com `{"q1": "...", "q2": "...", "condition": "...", "country": "..."}` |
 | `GET` | `/api/health` | Status, versão, backend de cache e avisos de configuração |
 | `GET` | `/healthz` | Healthcheck minimalista para orquestradores |
 | `POST` | `/api/admin/token` | Emite JWT com `{"password": "..."}` |
@@ -149,6 +160,8 @@ Exemplo:
 
 ```bash
 curl -s "http://localhost:8000/api/brief?q=rs113488022" | python -m json.tool
+curl -s -X POST "http://localhost:8000/api/compare" -H "Content-Type: application/json" \
+  -d '{"q1":"BRAF V600E","q2":"KRAS G12C"}' | python -m json.tool
 ```
 
 Erros: `422` entrada inválida, `404` variante não encontrada, `502` fonte indisponível,
@@ -170,6 +183,9 @@ Erros: `422` entrada inválida, `404` variante não encontrada, `502` fonte indi
 | `VTS_CORS_ORIGINS` | vazio | Origens permitidas (separadas por vírgula) |
 | `NCBI_API_KEY` / `NCBI_EMAIL` | vazios | Aumentam o limite da API NCBI |
 
+Nenhuma variável nova foi adicionada. O status de revisão do ClinVar usa as mesmas variáveis opcionais do NCBI e
+não exige chave; com `VTS_DEMO=1` a resposta é sintética e nenhuma chamada é feita.
+
 Copie `.env.example` para `.env` e **troque os segredos antes de publicar**.
 
 ---
@@ -179,13 +195,17 @@ Copie `.env.example` para `.env` e **troque os segredos antes de publicar**.
 ```bash
 make check          # Ruff + pytest
 node --check frontend/app.js
+node -e "require('./frontend/app.js'); globalThis.__VTS_TEST__.serializeCsv([['a','b']])"
 docker compose config -q
 ```
 
-- **44 testes offline**, sem rede e sem credenciais reais.
-- Cobertura: normalização de entradas, parsers, ranking, cache (SQLite e memória),
+- **55 testes offline**, sem rede e sem credenciais reais.
+- Cobertura: normalização de entradas (limite de 60 caracteres), parsers, ranking com caracteres especiais,
+  cache (SQLite e memória, inclusive varredura do `-wal` para garantir que o termo digitado não foi gravado),
+  ClinVar esummary (sucesso e falha parcial), comparação de briefs, limite de requisições com `429`,
   JWT, healthcheck, cache hit, erros HTTP, CSP e arquivos estáticos.
-- CI no GitHub Actions roda Ruff, pytest, checagem do JS, validação de JSON/YAML,
+- O serializador CSV puro também é verificado no CI com `node -e`, sem dependências npm.
+- CI no GitHub Actions roda Ruff, pytest, checagem do JS e do serializador CSV, validação de JSON/YAML,
   `docker compose config` e build da imagem em cada push/PR.
 - Dependabot mantém pip, Docker e Actions atualizados.
 
@@ -194,10 +214,12 @@ docker compose config -q
 ## Privacidade e segurança
 
 - Sem contas, sem cookies e sem analytics.
-- A consulta digitada **nunca** é gravada em claro: a chave do cache é um SHA-256 dos parâmetros normalizados.
+- A consulta digitada **nunca** é gravada em claro: a chave do cache é um SHA-256 dos parâmetros normalizados e o
+  payload cacheado usa rótulo canônico (`BRAF p.V600E`) e termos de busca canônicos sem a condição livre.
 - Consultas não são logadas; o `User-Agent` não contém dados do usuário.
 - CSP restritiva, `X-Frame-Options: DENY`, `nosniff`, `no-referrer` e `Cache-Control: no-store` na API.
-- Rate limit por IP em `/api/brief`; endpoints administrativos exigem JWT HS256 com `iss` e `exp`.
+- Rate limit por IP em `/api/brief`, com poda periódica e limite de tamanho do mapa; endpoints administrativos
+  exigem JWT HS256 com `iss` e `exp`.
 
 ---
 
@@ -212,7 +234,8 @@ docker compose config -q
 - A Vercel não mantém cache persistente entre invocações.
 
 **Roadmap**: CIViC/OncoKB, bulas FDA/ANVISA, contato de centros de ensaio, briefs salvos,
-resumo com verificação automática de citações e exportação PDF.
+resumo com verificação automática de citações e exportação PDF nativa (a impressão do navegador já salva em PDF).
+O botão "Imprimir / salvar PDF" usa essa impressão do navegador; CSV e JSON são downloads diretos do brief atual.
 
 > **Aviso:** ferramenta de pesquisa e informação — não é aconselhamento médico, diagnóstico nem
 > recomendação de tratamento. Converse sempre com seu médico assistente.
@@ -231,14 +254,15 @@ VariantScope/
 │   ├── security.py           # JWT
 │   ├── schemas.py            # modelos Pydantic
 │   ├── brief.py              # orquestração
+│   ├── compare.py            # comparação de dois briefs
 │   ├── normalize.py          # parser de entrada
-│   ├── sources.py            # clientes dbSNP/PubMed/CTGov
+│   ├── sources.py            # clientes dbSNP/ClinVar/PubMed/CTGov
 │   ├── http.py               # retry, rate limit e cache HTTP
 │   ├── ranking.py            # classificação de ensaios
 │   ├── demo_data.py          # transporte offline
-│   └── routers/              # health, brief, admin
+│   └── routers/              # health, brief/comparar, admin
 ├── frontend/                 # index.html, style.css, app.js, assets
-├── tests/                    # 44 testes
+├── tests/                    # 55 testes
 ├── .github/workflows/ci.yml
 ├── docker-compose.yml
 ├── Dockerfile

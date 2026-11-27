@@ -61,5 +61,25 @@ def test_documentacao_openapi():
         esquema = cliente.get("/api/openapi.json").json()
         caminhos = esquema["paths"]
         assert "/api/brief" in caminhos
+        assert "/api/compare" in caminhos
         assert "/api/admin/token" in caminhos
         assert "/api/health" in caminhos
+
+
+def test_limite_de_caracteres_igual_ao_parser():
+    with TestClient(modulo.app) as cliente:
+        assert cliente.get("/api/brief", params={"q": "B" * 61}).status_code == 422
+        assert cliente.get("/api/brief", params={"q": "B" * 60}).status_code == 422  # formato inválido, mas dentro do limite
+
+
+def test_rate_limit_retorna_429(monkeypatch):
+    from dataclasses import replace
+
+    monkeypatch.setattr(modulo, "settings", replace(modulo.settings, rate_limit=2))
+    with TestClient(modulo.app) as cliente:
+        cabecalho = {"x-forwarded-for": "198.51.100.77"}
+        for _ in range(2):
+            assert cliente.get("/api/brief", params={"q": "BRAF V600E"}, headers=cabecalho).status_code == 200
+        resposta = cliente.get("/api/brief", params={"q": "BRAF V600E"}, headers=cabecalho)
+        assert resposta.status_code == 429
+        assert resposta.json()["error"] == "rate_limited"

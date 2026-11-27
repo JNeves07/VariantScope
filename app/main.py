@@ -18,6 +18,24 @@ from .routers import admin, brief, health
 
 STATIC = Path(__file__).resolve().parent.parent / "frontend"
 _hits: dict[str, deque] = defaultdict(deque)
+_ultima_poda = 0.0
+MAX_IP_MONITORADOS = 1000
+
+
+def _podar_hits(agora: float) -> None:
+    """Remove janelas vazias e limita o mapa de IPs sem alterar o limite por IP."""
+    global _ultima_poda
+    if agora - _ultima_poda >= max(settings.rate_window, 1):
+        _ultima_poda = agora
+        for ip, janela in list(_hits.items()):
+            while janela and janela[0] < agora - settings.rate_window:
+                janela.popleft()
+            if not janela:
+                _hits.pop(ip, None)
+    excesso = len(_hits) - MAX_IP_MONITORADOS
+    if excesso > 0:
+        for ip in sorted(_hits, key=lambda chave: _hits[chave][-1])[:excesso]:
+            _hits.pop(ip, None)
 
 
 def criar_app() -> FastAPI:
@@ -77,7 +95,9 @@ def criar_app() -> FastAPI:
                 request.headers.get("x-forwarded-for")
                 or (request.client.host if request.client else "?")
             ).split(",")[0].strip()
-            janela, agora = _hits[ip], time.monotonic()
+            agora = time.monotonic()
+            _podar_hits(agora)
+            janela = _hits[ip]
             while janela and janela[0] < agora - settings.rate_window:
                 janela.popleft()
             if len(janela) >= settings.rate_limit:

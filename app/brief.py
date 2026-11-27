@@ -2,14 +2,22 @@
 from __future__ import annotations
 
 import asyncio
+from copy import deepcopy
 from datetime import UTC, datetime
 
 from .cache import CacheBackend, chave_consulta
 from .config import settings
 from .http import Http, SourceError
-from .normalize import ParsedQuery, parse_query
+from .normalize import ParsedQuery, ProteinChange, parse_query
 from .ranking import build_trials
-from .sources import ctgov_variant_term, fetch_dbsnp, fetch_pubmed, fetch_trials_raw, pubmed_term
+from .sources import (
+    ctgov_variant_term,
+    fetch_clinvar_review,
+    fetch_dbsnp,
+    fetch_pubmed,
+    fetch_trials_raw,
+    pubmed_term,
+)
 
 DISCLAIMER = {
     "en": "Research and information tool — not medical advice, diagnosis or a treatment recommendation. "
@@ -25,6 +33,27 @@ class NotFound(Exception):
 
 class UpstreamDown(Exception):
     pass
+
+
+async def _sem_revisao() -> None:
+    """Coroutine neutra quando a consulta não tem rsID resolvido."""
+    return None
+
+
+def _payload_privado(resultado: dict, q: ParsedQuery, gene: str | None, ch: ProteinChange | None,
+                     rsid: str | None) -> dict:
+    """Cópia para o cache sem texto digitado: rótulo e termos canônicos apenas."""
+    copia = deepcopy(resultado)
+    rotulo = f"{gene} p.{ch.short}" if gene and ch else (rsid or q.kind)
+    pubmed = pubmed_term(gene, ch, rsid, None) if gene and ch else ""
+    ctgov = ctgov_variant_term(gene, ch) if gene and ch else ""
+    copia["query"] = {
+        "raw": rotulo, "kind": q.kind, "condition": None,
+        "country": copia["query"]["country"],
+    }
+    copia["publications"] = {**copia["publications"], "query": pubmed}
+    copia["search_strings"] = {"pubmed": pubmed, "ctgov": ctgov}
+    return copia
 
 
 async def build_brief(http: Http, raw_query: str, condition: str | None, country: str | None,
@@ -73,10 +102,11 @@ async def build_brief(http: Http, raw_query: str, condition: str | None, country
 
     gene, ch = variant["gene"], variant["change"]
 
-    # 2. Literature + trials in parallel; one failing never blanks the page.
-    pub_res, tr_res = await asyncio.gather(
+    # 2. Literature + trials + ClinVar review in parallel; one failing never blanks the page.
+    pub_res, tr_res, cv_res = await asyncio.gather(
         fetch_pubmed(http, gene, ch, variant["rsid"], condition),
         fetch_trials_raw(http, gene, ch, condition, country),
+        fetch_clinvar_review(http, variant["rsid"]) if variant["rsid"] else _sem_revisao(),
         return_exceptions=True,
     )
     publications = {"total": 0, "items": [], "query": pubmed_term(gene, ch, variant["rsid"], condition)}
@@ -96,18 +126,28 @@ async def build_brief(http: Http, raw_query: str, condition: str | None, country
         if trials["capped"]:
             warnings.append({"code": "results_capped", "args": {}})
 
+    revisao = None
+    if isinstance(cv_res, Exception):
+        sources.append({"name": "ClinVar (esummary)", "status": "error", "fetched_at": now})
+        warnings.append({"code": "source_down", "args": {"source": "ClinVar (esummary)"}})
+    elif cv_res is not None:
+        revisao = cv_res
+        sources.append({"name": "ClinVar (esummary)", "status": "ok", "fetched_at": now})
+
     if variant["clinvar"] is not None:
         warnings.append({"code": "germline_vs_somatic", "args": {}})
 
     ch_d = {"short": ch.short, "long": ch.long, "codon": ch.codon}
     resultado = {
         "query": {"raw": raw_query, "kind": q.kind, "condition": condition, "country": country},
-        "variant": {**{k: v for k, v in variant.items() if k != "change"}, "change": ch_d},
+        "variant": {**{k: v for k, v in variant.items() if k != "change"},
+                    "change": ch_d, "clinvar_review": revisao},
         "publications": publications, "trials": trials,
         "search_strings": {"pubmed": publications["query"], "ctgov": ctgov_variant_term(gene, ch)},
         "warnings": warnings, "sources": sources, "generated_at": now,
         "demo": demo, "disclaimer": DISCLAIMER, "cached": False,
     }
     if cache is not None and chave is not None:
-        await cache.set(chave, resultado, ttl or settings.cache_ttl)
+        await cache.set(chave, _payload_privado(resultado, q, gene, ch, variant["rsid"]),
+                        ttl or settings.cache_ttl)
     return resultado

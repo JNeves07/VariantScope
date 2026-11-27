@@ -19,7 +19,8 @@ make test
 1. `make check` — Ruff e pytest precisam passar.
 2. Se mexeu no front-end, rode `node --check frontend/app.js`.
 3. Se adicionou uma fonte de dados, inclua fixtures em `tests/` e documente o schema da API.
-4. Nunca faça logging da consulta do usuário (rsID, gene, condição) nem gravando em claro no cache.
+4. Nunca faça logging da consulta do usuário (rsID, gene, condição) nem grave o texto em claro no cache:
+   use sempre rótulos e termos canônicos no payload cacheado.
 5. Atualize o README quando mudar comportamento visível ou variáveis de ambiente.
 
 ## Convenções

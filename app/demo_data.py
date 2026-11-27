@@ -71,6 +71,14 @@ def demo_studies():
     return S
 
 
+CLINVAR_REVIEW = {
+    "113488022": {
+        "title": "[DEMO] BRAF V600E",
+        "review_status": "criteria provided, multiple submitters, no conflicts",
+        "last_evaluated": "2025-04-12",
+    },
+}
+
 PUBS = {
     "9000001": {"title": "[DEMO] Randomised trial of BRAF/MEK inhibition in BRAF V600E tumours.", "src": "Demo J Oncol", "date": "2024 Jan",
                 "types": ["Randomized Controlled Trial", "Journal Article"]},
@@ -100,6 +108,11 @@ def _handler(request: httpx.Request) -> httpx.Response:
         return j({"esearchresult": {"count": "1234", "idlist": ids}})
     if u.path.endswith("esummary.fcgi"):
         ids = p.get("id", "").split(",")
+        if p.get("db") == "clinvar":
+            res = {"uids": [i for i in ids if i in CLINVAR_REVIEW]}
+            for i in res["uids"]:
+                res[i] = {"uid": i, **CLINVAR_REVIEW[i]}
+            return j({"result": res})
         res = {"uids": ids}
         for i in ids:
             d = PUBS[i]

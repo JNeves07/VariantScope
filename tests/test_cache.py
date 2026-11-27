@@ -93,3 +93,38 @@ def test_fabrica_respeita_backend():
         ),
         MemoryCache,
     )
+
+
+def test_cache_sqlite_nao_grava_termo_digitado(tmp_path):
+    """O texto digitado (inclusive filtros) não pode aparecer nem no WAL do SQLite."""
+    from app.brief import build_brief
+    from app.demo_data import demo_transport
+    from app.http import Http
+
+    caminho = tmp_path / "privacidade.sqlite3"
+
+    async def cena():
+        cache = SQLiteCache(caminho)
+        http = Http(transport=demo_transport())
+        try:
+            resposta = await build_brief(http, "rs113488022", "xyzzy", None, demo=True, cache=cache)
+        finally:
+            await http.aclose()
+        assert resposta["query"]["raw"] == "rs113488022"
+        assert "xyzzy" in resposta["publications"]["query"]  # apenas na resposta em memória
+
+        arquivos = sorted(tmp_path.glob("privacidade.sqlite3*"))
+        assert len(arquivos) >= 2  # inclui o -wal
+        for arquivo in arquivos:
+            assert b"xyzzy" not in arquivo.read_bytes()
+
+        em_cache = await cache.get(chave_consulta("rs113488022", "xyzzy", None, True))
+        assert em_cache is not None
+        assert em_cache["query"] == {"raw": "BRAF p.V600E", "kind": "rsid", "condition": None, "country": None}
+        assert all("xyzzy" not in v for v in em_cache["search_strings"].values())
+        assert "xyzzy" not in em_cache["publications"]["query"]
+        assert em_cache["variant"]["gene"] == "BRAF"
+        assert em_cache["variant"]["change"]["short"] == "V600E"
+        assert em_cache["variant"]["clinvar_review"]["last_evaluated"] == "2025-04-12"
+
+    executar(cena())

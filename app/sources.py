@@ -96,6 +96,37 @@ async def fetch_dbsnp(http: Http, rsid: str) -> dict:
     return parse_refsnp(data, rsid)
 
 
+# ------------------------------------------------------ ClinVar esummary ----
+
+def parse_clinvar_review(data: dict, rsid: str) -> dict | None:
+    """Extrai status de revisão e data da última avaliação do ClinVar por rsID."""
+    uid = rsid.lower().removeprefix("rs")
+    res = data.get("result") or {}
+    entry = res.get(uid) or res.get(rsid) or {}
+    status = str(entry.get("review_status") or "").strip() or None
+    avaliado = str(entry.get("last_evaluated") or entry.get("last_updated") or "").strip()[:10] or None
+    if not status and not avaliado:
+        return None
+    return {
+        "rsid": rsid,
+        "review_status": status,
+        "last_evaluated": avaliado,
+        "stars": _stars(status or ""),
+    }
+
+
+async def fetch_clinvar_review(http: Http, rsid: str) -> dict:
+    """Enriquecimento opcional: falha nunca apaga o restante do brief."""
+    data = await http.get_json(
+        "ClinVar", EUTILS + "esummary.fcgi",
+        {"db": "clinvar", "id": rsid.lower().removeprefix("rs"), "retmode": "json"},
+    )
+    revisao = parse_clinvar_review(data, rsid)
+    if revisao is None:
+        raise SourceError("ClinVar", "review summary unavailable", 404)
+    return revisao
+
+
 # --------------------------------------------------------------- PubMed -----
 
 def evidence_tier(pubtypes: list[str]) -> tuple[int, str]:
